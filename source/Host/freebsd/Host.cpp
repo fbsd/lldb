@@ -75,6 +75,33 @@ Host::ThreadCreated (const char *thread_name)
     {
         ::pthread_setspecific (g_thread_create_key, new FreeBSDThread(thread_name));
     }
+
+    // pthread_set_name_np_func fails if the thread name is longer than
+    // the supported limit on FreeBSD, but no error is returned.  Limit it
+    // to 16 characters, as done in Host/linux/Host.cpp
+    char namebuf[16];
+
+    // Thread names are coming in like '<lldb.comm.debugger.edit>' and '<lldb.comm.debugger.editline>'
+    // So just chopping the end of the string off leads to a lot of similar named threads.
+    // Go through the thread name and search for the last dot and use that.
+    const char *lastdot = ::strrchr( thread_name, '.' );
+
+    if (lastdot && lastdot != thread_name)
+        thread_name = lastdot + 1;
+    ::strncpy (namebuf, thread_name, sizeof(namebuf));
+    namebuf[ sizeof(namebuf) - 1 ] = 0;
+
+    int namebuflen = strlen(namebuf);
+    if (namebuflen > 0)
+    {
+        if (namebuf[namebuflen - 1] == '(' || namebuf[namebuflen - 1] == '>')
+        {
+            // Trim off trailing '(' and '>' characters for a bit more cleanup.
+            namebuflen--;
+            namebuf[namebuflen] = 0;
+        }
+        Host::SetThreadName (LLDB_INVALID_PROCESS_ID, LLDB_INVALID_THREAD_ID, namebuf);
+    }
 }
 
 void

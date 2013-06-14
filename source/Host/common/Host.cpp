@@ -682,6 +682,22 @@ Host::SetThreadName (lldb::pid_t pid, lldb::tid_t tid, const char *name)
             return true;
     }
     return false;
+#elif defined (__FreeBSD__)
+    lldb::pid_t curr_pid = Host::GetCurrentProcessID();
+    lldb::tid_t curr_tid = Host::GetCurrentThreadID();
+    if (pid == LLDB_INVALID_PROCESS_ID)
+        pid = curr_pid;
+
+    if (tid == LLDB_INVALID_THREAD_ID)
+        tid = curr_tid;
+
+    // Set the pthread name if possible
+    if (pid == curr_pid && tid == curr_tid)
+    {
+        ::pthread_set_name_np(::pthread_self(), name);
+        return true;
+    }
+    return false;
 #elif defined (__linux__) || defined (__GLIBC__)
     void *fn = dlsym (RTLD_DEFAULT, "pthread_setname_np");
     if (fn)
