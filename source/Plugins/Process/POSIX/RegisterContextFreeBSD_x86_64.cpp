@@ -64,7 +64,6 @@ static std::vector<RegisterInfo> & GetRegisterContext () {
     return g_register_infos;
 }
 
-
 RegisterContextFreeBSD_x86_64::RegisterContextFreeBSD_x86_64(Thread &thread, uint32_t concrete_frame_idx):
     RegisterContext_x86_64(thread, concrete_frame_idx)
 {

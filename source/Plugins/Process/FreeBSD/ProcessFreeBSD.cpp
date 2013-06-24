@@ -49,9 +49,11 @@ ProcessFreeBSD::Initialize()
 
     if (!g_initialized)
     {
+        g_initialized = true;
         PluginManager::RegisterPlugin(GetPluginNameStatic(),
                                       GetPluginDescriptionStatic(),
                                       CreateInstance);
+
         Log::Callbacks log_callbacks = {
             ProcessPOSIXLog::DisableLog,
             ProcessPOSIXLog::EnableLog,
@@ -60,7 +62,6 @@ ProcessFreeBSD::Initialize()
 
         Log::RegisterLogChannel (ProcessFreeBSD::GetPluginNameStatic(), log_callbacks);
         ProcessPOSIXLog::RegisterPluginName(GetPluginNameStatic());
-        g_initialized = true;
     }
 }
 

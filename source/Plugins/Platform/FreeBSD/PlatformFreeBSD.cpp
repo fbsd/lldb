@@ -153,7 +153,6 @@ PlatformFreeBSD::~PlatformFreeBSD()
 {
 }
 
-
 Error
 PlatformFreeBSD::ResolveExecutable (const FileSpec &exe_file,
                                     const ArchSpec &exe_arch,
