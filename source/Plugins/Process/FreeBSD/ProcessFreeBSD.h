@@ -26,7 +26,6 @@ class ProcessMonitor;
 class ProcessFreeBSD :
     public ProcessPOSIX
 {
-
 public:
     //------------------------------------------------------------------
     // Static functions.
@@ -34,7 +33,7 @@ public:
     static lldb::ProcessSP
     CreateInstance(lldb_private::Target& target,
                    lldb_private::Listener &listener,
-                   const lldb_private::FileSpec *crash_file_path);
+                   const lldb_private::FileSpec *);
 
     static void
     Initialize();

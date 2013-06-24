@@ -1252,7 +1252,7 @@ ProcessMonitor::GetCrashReasonForSIGSEGV(const siginfo_t *info)
 
     reason = ProcessMessage::eInvalidCrashReason;
 
-    switch (info->si_code) 
+    switch (info->si_code)
     {
     default:
         assert(false && "unexpected si_code for SIGSEGV");
@@ -1264,7 +1264,7 @@ ProcessMonitor::GetCrashReasonForSIGSEGV(const siginfo_t *info)
         reason = ProcessMessage::ePrivilegedAddress;
         break;
     }
-        
+
     return reason;
 }
 
@@ -1607,7 +1607,7 @@ ProcessMonitor::Detach(lldb::tid_t tid)
         DoOperation(&op);
     }
     return error;
-}    
+}
 
 bool
 ProcessMonitor::DupDescriptor(const char *path, int fd, int flags)
