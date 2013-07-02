@@ -37,7 +37,8 @@ class ReadWriteLock
 {
 public:
     ReadWriteLock () :
-        m_rwlock()
+        m_rwlock(),
+        m_running(false)
     {
         int err = ::pthread_rwlock_init(&m_rwlock, NULL); (void)err;
 //#if LLDB_CONFIGURATION_DEBUG
@@ -56,7 +57,13 @@ public:
     bool
     ReadTryLock ()
     {
-        return ::pthread_rwlock_tryrdlock (&m_rwlock) == 0;
+        ::pthread_rwlock_rdlock (&m_rwlock);
+        if (m_running == false)
+        {
+            return true;
+        }
+        ::pthread_rwlock_unlock (&m_rwlock);
+        return false;
     }
 
     bool
@@ -68,19 +75,31 @@ public:
     bool
     WriteLock()
     {
-        return ::pthread_rwlock_wrlock (&m_rwlock) == 0;
+        ::pthread_rwlock_wrlock (&m_rwlock);
+        m_running = true;
+        ::pthread_rwlock_unlock (&m_rwlock);
+        return true;
     }
     
     bool
     WriteTryLock()
     {
-        return ::pthread_rwlock_trywrlock (&m_rwlock) == 0;
+        if (::pthread_rwlock_trywrlock (&m_rwlock) == 0)
+        {
+            m_running = true;
+            ::pthread_rwlock_unlock (&m_rwlock);
+            return true;
+        }
+        return false;
     }
     
     bool
     WriteUnlock ()
     {
-        return ::pthread_rwlock_unlock (&m_rwlock) == 0;
+        ::pthread_rwlock_wrlock (&m_rwlock);
+        m_running = false;
+        ::pthread_rwlock_unlock (&m_rwlock);
+        return true;
     }
 
     class ReadLocker
@@ -136,6 +155,7 @@ public:
 
 protected:
     pthread_rwlock_t m_rwlock;
+    bool m_running;
 private:
     DISALLOW_COPY_AND_ASSIGN(ReadWriteLock);
 };
